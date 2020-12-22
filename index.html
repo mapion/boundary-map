@@ -4,15 +4,22 @@
 <meta charset="utf-8" />
 <title>boundary-map</title>
 <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-<script src="https://api.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.js"></script>
-<link href="https://api.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.css" rel="stylesheet" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.13.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.13.0/mapbox-gl.css" rel="stylesheet" />
 <style>
 	body { margin: 0; padding: 0; }
 	#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+  #appstore {
+    position: absolute;
+    top: 0;
+    right: 40px;
+    padding: 10px;
+  }
 </style>
 </head>
 <body>
 <div id="map"></div>
+<a id="appstore" href="https://apps.apple.com/us/app/%E5%9C%B0%E5%9B%B3%E3%83%9E%E3%83%94%E3%82%AA%E3%83%B3/id531032350?itsct=apps_box&amp;itscg=30200" style="display: inline-block; overflow: hidden; border-radius: 13px; width: 125px; height: 42px;"><img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-US?size=125x42&amp;releaseDate=1338940800&h=9f046c81854a44b4171e0098aa0d4f6f" alt="Download on the App Store" style="border-radius: 13px; width: 125px; height: 42px;"></a>
 <script>
   var oazaMinZoom = 12;
   var prefTappedStateId = null;

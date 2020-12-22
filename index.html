@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>boundary-map</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.css" rel="stylesheet" />
+<style>
+	body { margin: 0; padding: 0; }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+  var oazaMinZoom = 12;
+  var prefTappedStateId = null;
+  var cityTappedStateId = null;
+  var oazaTappedStateId = null;
+  var azaTappedStateId = null;
+
+  var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'https://vt-cm01.mapion.co.jp/gl-server/style/boundary-map.json?access_token=mt-pk.eyJ1IjoibWFwaW9uIiwiYSI6InJ5ZXFiOWJyZ3J2MjV3ZDcyNXY3Z3dmYzYifQ.XoOA7fe-5nUi8ALSyCl277',
+    center: [139.749792, 35.64169],
+    minZoom: 4,
+    maxZoom: 18,
+    zoom: 6,
+    hash: true
+  }).addControl(new mapboxgl.NavigationControl());
+
+  map.on('click', 'pref_polygon', function (e) {
+    const west = e.features[0].properties.w;
+    const north = e.features[0].properties.n;
+    const east = e.features[0].properties.e;
+    const south = e.features[0].properties.s;
+    map.fitBounds([
+      [west, south],
+      [east, north]
+    ]);
+
+    clean();
+    prefTappedStateId = e.features[0].id;
+    map.setLayoutProperty('pref_polygon unfocus', 'visibility', 'visible');
+    map.setFeatureState(
+      { source: 'area_polygon', sourceLayer: 'pref_polygon unfocus', id: prefTappedStateId },
+      { tap: true }
+    );
+    map.setFeatureState(
+      { source: 'area_polygon', sourceLayer: 'pref_polygon', id: prefTappedStateId },
+      { tap: true }
+    );
+    map.setFeatureState(
+      { source: 'area_polygon', sourceLayer: 'pref_polygon label', id: prefTappedStateId },
+      { tap: true }
+    );
+  });
+
+  map.on('click', 'city_polygon', function (e) {
+    const west = e.features[0].properties.w;
+    const north = e.features[0].properties.n;
+    const east = e.features[0].properties.e;
+    const south = e.features[0].properties.s;
+    map.fitBounds([
+      [west, south],
+      [east, north]
+    ]);
+
+    clean();
+    cityTappedStateId = e.features[0].id;
+    map.setLayoutProperty('city_polygon unfocus', 'visibility', 'visible');
+    map.setFeatureState(
+      { source: 'area_polygon', sourceLayer: 'city_polygon unfocus', id: cityTappedStateId },
+      { tap: true }
+    );
+    map.setFeatureState(
+      { source: 'area_polygon', sourceLayer: 'city_polygon', id: cityTappedStateId },
+      { tap: true }
+    );
+    map.setFeatureState(
+      { source: 'area_polygon', sourceLayer: 'city_polygon label', id: cityTappedStateId },
+      { tap: true }
+    );
+  });
+
+  map.on('click', 'oaza_polygon', function (e) {
+    console.log(e.features[0]);
+    const west = e.features[0].properties.w;
+    const north = e.features[0].properties.n;
+    const east = e.features[0].properties.e;
+    const south = e.features[0].properties.s;
+    map.fitBounds([
+      [west, south],
+      [east, north]
+    ]);
+
+    clean();
+    oazaTappedStateId = e.features[0].id;
+    map.setLayoutProperty('oaza_polygon unfocus', 'visibility', 'visible');
+    map.setFeatureState(
+      { source: 'area_polygon', sourceLayer: 'oaza_polygon unfocus', id: oazaTappedStateId },
+      { tap: true }
+    );
+    map.setFeatureState(
+      { source: 'area_polygon', sourceLayer: 'oaza_polygon', id: oazaTappedStateId },
+      { tap: true }
+    );
+    map.setFeatureState(
+      { source: 'area_polygon', sourceLayer: 'oaza_polygon label', id: oazaTappedStateId },
+      { tap: true }
+    );
+  });
+
+  map.on('click', 'aza_polygon', function (e) {
+    // console.log(e.features[0]);
+    const west = e.features[0].properties.w;
+    const north = e.features[0].properties.n;
+    const east = e.features[0].properties.e;
+    const south = e.features[0].properties.s;
+    console.log(e.features[0].properties.prefcode, e.features[0].properties.citycode, e.features[0].properties.oazacode, e.features[0].properties.azacode);
+    console.log(west, east, south, north);
+    map.fitBounds([
+      [west, south],
+      [east, north]
+    ]);
+
+    clean();
+    azaTappedStateId = e.features[0].id;
+    map.setLayoutProperty('aza_polygon unfocus', 'visibility', 'visible');
+    map.setFeatureState(
+      { source: 'area_polygon', sourceLayer: 'aza_polygon unfocus', id: azaTappedStateId },
+      { tap: true }
+    );
+    map.setFeatureState(
+      { source: 'area_polygon', sourceLayer: 'aza_polygon', id: azaTappedStateId },
+      { tap: true }
+    );
+    map.setFeatureState(
+      { source: 'area_polygon', sourceLayer: 'aza_polygon label', id: azaTappedStateId },
+      { tap: true }
+    );
+  });
+
+  function clean() {
+    if (prefTappedStateId !== null) {
+      map.setLayoutProperty('pref_polygon unfocus', 'visibility', 'none');
+      map.setFeatureState(
+        { source: 'area_polygon', sourceLayer: 'pref_polygon unfocus', id: prefTappedStateId },
+        { tap: false }
+      );
+      map.setFeatureState(
+        { source: 'area_polygon', sourceLayer: 'pref_polygon', id: prefTappedStateId },
+        { tap: false }
+      );
+      map.setFeatureState(
+        { source: 'area_polygon', sourceLayer: 'pref_polygon label', id: prefTappedStateId },
+        { tap: false }
+      );
+    }
+    if (cityTappedStateId !== null) {
+      map.setLayoutProperty('city_polygon unfocus', 'visibility', 'none');
+      map.setFeatureState(
+        { source: 'area_polygon', sourceLayer: 'city_polygon unfocus', id: cityTappedStateId },
+        { tap: false }
+      );
+      map.setFeatureState(
+        { source: 'area_polygon', sourceLayer: 'city_polygon', id: cityTappedStateId },
+        { tap: false }
+      );
+      map.setFeatureState(
+        { source: 'area_polygon', sourceLayer: 'city_polygon label', id: cityTappedStateId },
+        { tap: false }
+      );
+    }
+    if (oazaTappedStateId !== null) {
+      map.setLayoutProperty('oaza_polygon unfocus', 'visibility', 'none');
+      map.setFeatureState(
+        { source: 'area_polygon', sourceLayer: 'oaza_polygon unfocus', id: oazaTappedStateId },
+        { tap: false }
+      );
+      map.setFeatureState(
+        { source: 'area_polygon', sourceLayer: 'oaza_polygon', id: oazaTappedStateId },
+        { tap: false }
+      );
+      map.setFeatureState(
+        { source: 'area_polygon', sourceLayer: 'oaza_polygon label', id: oazaTappedStateId },
+        { tap: false }
+      );
+    }
+    if (azaTappedStateId !== null) {
+      map.setLayoutProperty('aza_polygon unfocus', 'visibility', 'none');
+      map.setFeatureState(
+        { source: 'area_polygon', sourceLayer: 'aza_polygon unfocus', id: azaTappedStateId },
+        { tap: false }
+      );
+      map.setFeatureState(
+        { source: 'area_polygon', sourceLayer: 'aza_polygon', id: azaTappedStateId },
+        { tap: false }
+      );
+      map.setFeatureState(
+        { source: 'area_polygon', sourceLayer: 'aza_polygon label', id: azaTappedStateId },
+        { tap: false }
+      );
+    }
+  }
+</script>
+
+</body>
+</html>

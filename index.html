@@ -26,6 +26,7 @@
   var cityTappedStateId = null;
   var oazaTappedStateId = null;
   var azaTappedStateId = null;
+  var orderPolygon = [];
 
   var map = new mapboxgl.Map({
     container: 'map',
@@ -37,7 +38,32 @@
     hash: true
   }).addControl(new mapboxgl.NavigationControl());
 
+  map.on('click', function(e) {
+    orderPolygon.length = 0;
+
+    var features = map.queryRenderedFeatures(e.point);
+    for (var i = 0; i < features.length; i++) {
+      var f = features[i];
+      var sourceLayer = f.layer['source-layer'];
+      if (sourceLayer === 'pref_polygon' && f.properties.n && f.properties.e && f.properties.s && f.properties.w) {
+        orderPolygon.push(4);
+      }
+      if (sourceLayer === 'city_polygon' && f.properties.n && f.properties.e && f.properties.s && f.properties.w) {
+        orderPolygon.push(3);
+      }
+      if (sourceLayer === 'oaza_polygon' && f.properties.n && f.properties.e && f.properties.s && f.properties.w) {
+        orderPolygon.push(2);
+      }
+      if (sourceLayer === 'aza_polygon' && f.properties.n && f.properties.e && f.properties.s && f.properties.w) {
+        orderPolygon.push(1);
+      }
+    }
+    orderPolygon.sort();
+  });
+
   map.on('click', 'pref_polygon', function (e) {
+    if (orderPolygon[0] !== 4) return;
+
     const west = e.features[0].properties.w;
     const north = e.features[0].properties.n;
     const east = e.features[0].properties.e;
@@ -65,6 +91,8 @@
   });
 
   map.on('click', 'city_polygon', function (e) {
+    if (orderPolygon[0] !== 3) return;
+
     const west = e.features[0].properties.w;
     const north = e.features[0].properties.n;
     const east = e.features[0].properties.e;
@@ -92,7 +120,8 @@
   });
 
   map.on('click', 'oaza_polygon', function (e) {
-    console.log(e.features[0]);
+    if (orderPolygon[0] !== 2) return;
+
     const west = e.features[0].properties.w;
     const north = e.features[0].properties.n;
     const east = e.features[0].properties.e;
@@ -120,13 +149,12 @@
   });
 
   map.on('click', 'aza_polygon', function (e) {
-    // console.log(e.features[0]);
+    if (orderPolygon[0] !== 1) return;
+
     const west = e.features[0].properties.w;
     const north = e.features[0].properties.n;
     const east = e.features[0].properties.e;
     const south = e.features[0].properties.s;
-    console.log(e.features[0].properties.prefcode, e.features[0].properties.citycode, e.features[0].properties.oazacode, e.features[0].properties.azacode);
-    console.log(west, east, south, north);
     map.fitBounds([
       [west, south],
       [east, north]
